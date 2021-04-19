@@ -10,7 +10,7 @@
 
 QHostAddress rpi_addr("127.0.0.1");
 
-const int PATH_STATUS_DELAY = 500;
+const int PATH_STATUS_DELAY = 100;
 const int IDLE_STATUS_DELAY = 4000;
 
 
@@ -82,7 +82,7 @@ void MainWindow::moveTimer_timeout()
         switch( nextMove.type )
         {
         case PATH_MOVE:
-            ang = calculate_angles(nextMove.x, nextMove.y);
+            ang = calculate_angles(nextMove.x - ARM1_X, nextMove.y);
             ui->armCanvas->setArmPosition(ang, nextMove.x, nextMove.y);
             break;
 
@@ -91,14 +91,18 @@ void MainWindow::moveTimer_timeout()
             break;
 
         case PATH_PEN_DOWN:
+            ang = calculate_angles(nextMove.x - ARM1_X, nextMove.y);
+            ui->armCanvas->setArmPosition(ang, nextMove.x, nextMove.y);
             ui->armCanvas->penDown = true;
             break;
 
         case PATH_END:
             arm1_mode = MODE_IDLE;
             send_status(1);
+            break;
 
         default:
+        case PATH_NONE:
             break;
         }
     }
@@ -119,7 +123,7 @@ void MainWindow::moveTimer_timeout()
         switch( nextMove.type )
         {
         case PATH_MOVE:
-            ang = calculate_angles(nextMove.x, nextMove.y);
+            ang = calculate_angles(nextMove.x - ARM2_X, nextMove.y);
             ui->armCanvas->setArm2Position(ang, nextMove.x, nextMove.y);
             break;
 
@@ -128,7 +132,7 @@ void MainWindow::moveTimer_timeout()
             break;
 
         case PATH_PEN_DOWN:
-            ang = calculate_angles(nextMove.x, nextMove.y);
+            ang = calculate_angles(nextMove.x - ARM2_X, nextMove.y);
             ui->armCanvas->setArm2Position(ang, nextMove.x, nextMove.y);
             ui->armCanvas->penDown2 = true;
             break;
@@ -136,8 +140,10 @@ void MainWindow::moveTimer_timeout()
         case PATH_END:
             arm2_mode = MODE_IDLE;
             send_status(2);
+            break;
 
         default:
+        case PATH_NONE:
             break;
         }
     }
@@ -200,4 +206,15 @@ void MainWindow::server2_newConnection()
         connect(w, &ReceiveWrapper::point_received, this, &MainWindow::enqueueArm2);
         connect(w, &ReceiveWrapper::setting_received, this, &MainWindow::settingChange2);
     }
+}
+
+void MainWindow::on_resetButton_clicked()
+{
+    ui->armCanvas->reset();
+
+    arm1_mode = MODE_IDLE;
+    arm1path.clear();
+
+    arm2_mode = MODE_IDLE;
+    arm2path.clear();
 }
