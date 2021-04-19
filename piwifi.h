@@ -2,6 +2,7 @@
 
 #include <QObject>
 #include <QtNetwork/QTcpSocket>
+#include <QtNetwork/QHostAddress>
 
 #include <stdint.h>
 #include "pathiterator.h"
@@ -83,5 +84,49 @@ public:
 
 signals:
     void point_received( PathElement elem );
+};
+
+
+class TransmitWrapper : public QObject
+{
+    Q_OBJECT
+private:
+    QTcpSocket *socket;
+    QByteArray data;
+    int send_length = 0;
+    int bytes_sent = 0;
+
+    void on_connected() { socket->write(data.data(), data.size()); }
+    void on_error()
+    {
+        socket->close();
+        this->deleteLater();
+    }
+
+    void on_write( int n_bytes )
+    {
+        bytes_sent += n_bytes;
+        if( bytes_sent >= send_length )
+        {
+            socket->close();
+            this->deleteLater();
+        }
+    }
+
+public:
+    TransmitWrapper( QObject *parent ) : QObject(parent)
+    {
+        socket = new QTcpSocket(this);
+        connect(socket, &QTcpSocket::connected, this, &TransmitWrapper::on_connected);
+        connect(socket, &QTcpSocket::errorOccurred, this, &TransmitWrapper::on_error);
+        connect(socket, &QTcpSocket::bytesWritten, this, &TransmitWrapper::on_write);
+    }
+
+    void start_transmit( QHostAddress addr, QByteArray bytes )
+    {
+        data = bytes;
+        send_length = bytes.size();
+        socket->connectToHost(addr, 1896);
+    }
 };
 

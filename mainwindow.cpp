@@ -8,6 +8,8 @@
 #include <sstream>
 
 
+QHostAddress rpi_addr("127.0.0.1");
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -44,11 +46,15 @@ void MainWindow::send_status( int device )
     {
         // pkt_type, id, power, mode, shoulder, elbow, odo, remaining
         QString data = QString("1,%1,1,%2,0,0,0,%3\n").arg(device, arm1_mode, arm1path.remaining());
+        TransmitWrapper *w = new TransmitWrapper(this);
+        w->start_transmit(rpi_addr, data.toUtf8());
     }
     else
     {
 
         QString data = QString("1,%1,1,%2,0,0,0,%3\n").arg(device, arm2_mode, arm2path.remaining());
+        TransmitWrapper *w = new TransmitWrapper(this);
+        w->start_transmit(rpi_addr, data.toUtf8());
     }
 }
 
