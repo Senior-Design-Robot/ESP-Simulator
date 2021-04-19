@@ -7,10 +7,11 @@ ArmDisplay::ArmDisplay(QWidget *parent) : QWidget(parent)
     angles.shoulder = M_PI_2;
     angles.elbow = -M_PI;
 
-    angles2.shoulder = M_PI_2;
-    angles2.elbow = -M_PI;
+    angles2.shoulder = -M_PI_2;
+    angles2.elbow = M_PI_2;
 
     penDown = false;
+    penDown2 = false;
 }
 
 void ArmDisplay::setArmPosition( struct arm_angles ang, float tipX, float tipY )
@@ -58,6 +59,13 @@ void ArmDisplay::paintEvent( QPaintEvent * )
         painter.drawPoint(adj);
     }
 
+    for( QPointF &pt : pastPoints2 )
+    {
+        QPointF adj = (pt * scale) + center2;
+        painter.setPen(QPen(QColor(0,0,0), 2));
+        painter.drawPoint(adj);
+    }
+
     float ax = center.x() + asize * cosf(angles.shoulder);
     float ay = center.y() - asize * sinf(angles.shoulder);
     QPointF a_tip(ax, ay);
@@ -73,7 +81,7 @@ void ArmDisplay::paintEvent( QPaintEvent * )
     painter.drawLine(a_tip, b_tip);
 
     //arm 2
-    float ax2 = center2.x() + asize + cosf(angles2.shoulder) - 147;
+    float ax2 = center2.x() + asize + cosf(angles2.shoulder); //-147
     float ay2 = center2.y() - asize * sinf(angles2.shoulder);
     QPointF a_tip2(ax2, ay2);
 

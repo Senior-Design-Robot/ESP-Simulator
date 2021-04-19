@@ -124,13 +124,13 @@ void MainWindow::moveTimer_timeout()
             break;
 
         case PATH_PEN_UP:
-            ui->armCanvas->penDown = false;
+            ui->armCanvas->penDown2 = false;
             break;
 
         case PATH_PEN_DOWN:
             ang = calculate_angles(nextMove.x, nextMove.y);
             ui->armCanvas->setArm2Position(ang, nextMove.x, nextMove.y);
-            ui->armCanvas->penDown = true;
+            ui->armCanvas->penDown2 = true;
             break;
 
         case PATH_END:
@@ -159,6 +159,7 @@ void MainWindow::settingChange1( int settingId, int settingVal )
     if( settingId == SETTING_MODE )
     {
         arm1_mode = static_cast<EspMode>(settingVal);
+        arm2_mode = static_cast<EspMode>(settingVal);
     }
 }
 
