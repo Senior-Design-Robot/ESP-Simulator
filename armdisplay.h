@@ -9,6 +9,7 @@ class ArmDisplay : public QWidget
     Q_OBJECT
 private:
     struct arm_angles angles;
+    struct arm_angles angles2;
 
     static constexpr float REAL_WIDTH = LEN_A + LEN_B;
 
