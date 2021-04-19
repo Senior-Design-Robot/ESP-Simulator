@@ -45,6 +45,8 @@ private slots:
     void server1_newConnection();
     void server2_newConnection();
 
+    void on_resetButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     QTimer moveTimer;

@@ -7,8 +7,8 @@ ArmDisplay::ArmDisplay(QWidget *parent) : QWidget(parent)
     angles.shoulder = M_PI_2;
     angles.elbow = -M_PI;
 
-    angles2.shoulder = -M_PI_2;
-    angles2.elbow = M_PI_2;
+    angles2.shoulder = M_PI_2;
+    angles2.elbow = -M_PI;
 
     penDown = false;
     penDown2 = false;
@@ -25,7 +25,7 @@ void ArmDisplay::setArmPosition( struct arm_angles ang, float tipX, float tipY )
 void ArmDisplay::setArm2Position(struct arm_angles ang, float tipX, float tipY)
 {
     angles2 = ang;
-    if( penDown2 ) pastPoints2.push_back(QPointF(tipX, tipY));
+    if( penDown2 ) pastPoints2.push_back(QPointF(tipX, -tipY));
 
     update();
 }
@@ -42,15 +42,17 @@ void ArmDisplay::paintEvent( QPaintEvent * )
     QPainter painter(this);
     QRectF canvas = rect();
 
-    QPointF center = canvas.center();
-    center.setX(center.x() + 225);
-
-    QPointF center2 = canvas.center();
-    center2.setX((center2.x() - 225));
-
-    float scale = (float)(qMin(canvas.width(), canvas.height()) / (2 * (REAL_WIDTH)));
+    float scale = (float)(qMin(canvas.width(), canvas.height()) / REAL_WIDTH);
     float asize = LEN_A * scale;
     float bsize = LEN_B * scale;
+
+    QPointF center = canvas.center();
+
+    QPointF arm1Base = canvas.center();
+    arm1Base.setX(center.x() + (scale * ARM1_X));
+
+    QPointF arm2Base = canvas.center();
+    arm2Base.setX(arm2Base.x() + (scale * ARM2_X));
 
     for( QPointF &pt : pastPoints )
     {
@@ -61,13 +63,13 @@ void ArmDisplay::paintEvent( QPaintEvent * )
 
     for( QPointF &pt : pastPoints2 )
     {
-        QPointF adj = (pt * scale) + center2;
+        QPointF adj = (pt * scale) + center;
         painter.setPen(QPen(QColor(0,0,0), 2));
         painter.drawPoint(adj);
     }
 
-    float ax = center.x() + asize * cosf(angles.shoulder);
-    float ay = center.y() - asize * sinf(angles.shoulder);
+    float ax = arm1Base.x() + asize * cosf(angles.shoulder);
+    float ay = arm1Base.y() - asize * sinf(angles.shoulder);
     QPointF a_tip(ax, ay);
 
     float bx = ax + bsize * cosf(angles.shoulder + angles.elbow);
@@ -75,24 +77,24 @@ void ArmDisplay::paintEvent( QPaintEvent * )
     QPointF b_tip(bx, by);
 
     painter.setPen(QColor(255, 0, 0));
-    painter.drawLine(center, a_tip);
+    painter.drawLine(arm1Base, a_tip);
 
     painter.setPen(QColor(0, 0, 255));
     painter.drawLine(a_tip, b_tip);
 
     //arm 2
-    float ax2 = center2.x() + asize + cosf(angles2.shoulder); //-147
-    float ay2 = center2.y() - asize * sinf(angles2.shoulder);
+    float ax2 = arm2Base.x() + asize * cosf(angles2.shoulder); //-147
+    float ay2 = arm2Base.y() - asize * sinf(angles2.shoulder);
     QPointF a_tip2(ax2, ay2);
 
     float bx2 = ax2 + bsize * cosf(angles2.shoulder + angles2.elbow);
     float by2 = ay2 - bsize * sinf(angles2.shoulder + angles2.elbow);
     QPointF b_tip2(bx2, by2);
 
-    painter.setPen(QColor(255, 255, 0));
-    painter.drawLine(center2, a_tip2);
+    painter.setPen(QColor(255, 128, 0));
+    painter.drawLine(arm2Base, a_tip2);
 
-    painter.setPen(QColor(0, 255, 255));
+    painter.setPen(QColor(0, 255, 0));
     painter.drawLine(a_tip2, b_tip2);
 
 

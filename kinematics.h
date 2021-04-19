@@ -4,6 +4,9 @@
 #define LEN_B 20.0
 #define ARM_REACH (LEN_A + LEN_B)
 
+#define ARM1_X (-5.0f)
+#define ARM2_X 5.0f
+
 #include <cmath>
 
 struct arm_angles
