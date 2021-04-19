@@ -32,10 +32,23 @@ MainWindow::~MainWindow()
     delete server2;
 }
 
-void MainWindow::toggle_drawing( bool go )
+void MainWindow::toggle_drawing( int settingMode, int settingValue )
 {
-    if( go ) moveTimer.start();
-    else moveTimer.stop();
+    if(settingMode == SETTING_MODE)
+    {
+        if( settingValue == MODE_DRAW )
+        {
+            moveTimer.start();
+            arm1_mode = MODE_DRAW;
+            arm2_mode = MODE_DRAW;
+        }
+        else
+        {
+            moveTimer.stop();
+            arm1_mode = MODE_PAUSE;
+            arm2_mode = MODE_PAUSE;
+        }
+    }
 }
 
 void MainWindow::send_status( int device )
@@ -126,6 +139,7 @@ void MainWindow::server1_newConnection()
         QTcpSocket *newConn = server1->nextPendingConnection();
         ReceiveWrapper *w = new ReceiveWrapper(newConn, &arm1Buffer, this);
         connect(w, &ReceiveWrapper::point_received, this, &MainWindow::enqueueArm1);
+        connect(w, &ReceiveWrapper::setting_received, this, &MainWindow::toggle_drawing);
     }
 }
 
@@ -136,5 +150,6 @@ void MainWindow::server2_newConnection()
         QTcpSocket *newConn = server2->nextPendingConnection();
         ReceiveWrapper *w = new ReceiveWrapper(newConn, &arm2Buffer, this);
         connect(w, &ReceiveWrapper::point_received, this, &MainWindow::enqueueArm2);
+        connect(w, &ReceiveWrapper::setting_received, this, &MainWindow::toggle_drawing);
     }
 }

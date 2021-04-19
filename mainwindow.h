@@ -57,7 +57,7 @@ private:
     EspMode arm1_mode = MODE_IDLE;
     EspMode arm2_mode = MODE_IDLE;
 
-    void toggle_drawing( bool go );
+    void toggle_drawing( int settingMode, int settingValue );
     void send_status( int device );
 };
 #endif // MAINWINDOW_H

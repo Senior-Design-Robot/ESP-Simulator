@@ -190,6 +190,14 @@ void ReceiveWrapper::handle_incoming_data()
 
         buffer->munch(WPKT_POINTS_LEN + (WPOINT_LEN * nPts));
     }
+    else if( result == WPKT_SETTING )
+    {
+        int settingID = buffer->packetByte(WFIELD_SETTING_ID);
+        int settingValue = buffer->packetByte(WFIELD_SETTING_VAL);
+
+
+        emit setting_received(settingMode, settingValue);
+    }
 }
 
 void ReceiveWrapper::handle_socket_disconn()
