@@ -17,6 +17,10 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+public slots:
+    void enqueueArm1(PathElement P);
+    void enqueueArm2(PathElement P);
+
 private slots:
     //void on_clearButton_clicked();
 

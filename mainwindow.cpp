@@ -7,12 +7,16 @@
 #include <fstream>
 #include <sstream>
 
+PathQueueIterator arm1path;
+PathQueueIterator arm2path;
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow), path(nullptr)
 {
     ui->setupUi(this);
     moveTimer.setInterval(10);
+
 }
 
 MainWindow::~MainWindow()
@@ -38,10 +42,16 @@ void MainWindow::recalc_angles( float x, float y )
 
 }
 
-/*void MainWindow::on_clearButton_clicked()
+void MainWindow::enqueueArm1(PathElement P)
 {
-    ui->armCanvas->reset();
-}*/
+    arm1path.addElement(P);
+}
+
+void MainWindow::enqueueArm2(PathElement P)
+{
+    arm2path.addElement(P);
+}
+
 
 static float parseFloatStrict( std::string str ) {
     size_t lenParsed;
