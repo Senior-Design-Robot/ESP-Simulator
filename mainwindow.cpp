@@ -103,6 +103,11 @@ void MainWindow::on_clearButton_clicked()
     ui->armCanvas->reset();
 }
 
+void MainWindow::on_stopButton_clicked()
+{
+
+}
+
 void MainWindow::on_gotoButton_clicked()
 {
     PathQueueIterator *pqi = dynamic_cast<PathQueueIterator*>(path);
@@ -252,7 +257,7 @@ void MainWindow::on_openPathButton_clicked()
             throw std::invalid_argument(buf.str());
         }
 
-        pqi->addMove(ptX, ptY, firstPt);
+        pqi->addMove(ptX, ptY);
         if( firstPt )
         {
             pqi->addPenMove(true);
@@ -268,7 +273,7 @@ void MainWindow::on_openPathButton_clicked()
     layoutFile.close();
 
     pqi->addPenMove(false);
-    pqi->addMove(-10, 0, true);
+    pqi->addMove(-10, 0);
 
     toggle_drawing(true);
 }

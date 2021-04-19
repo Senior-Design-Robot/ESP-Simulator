@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>1312</width>
     <height>600</height>
    </rect>
   </property>
@@ -90,17 +90,17 @@
       </item>
       <item>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>Shoulder Angle</string>
-          </property>
-         </widget>
-        </item>
         <item row="2" column="0">
          <widget class="QLabel" name="label_4">
           <property name="text">
            <string>Elbow Angle</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLabel" name="elbowAng">
+          <property name="text">
+           <string>TextLabel</string>
           </property>
          </widget>
         </item>
@@ -111,10 +111,10 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
-         <widget class="QLabel" name="elbowAng">
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_3">
           <property name="text">
-           <string>TextLabel</string>
+           <string>Shoulder Angle</string>
           </property>
          </widget>
         </item>
@@ -135,6 +135,20 @@
       </item>
       <item>
        <layout class="QGridLayout" name="gridLayout_2">
+        <item row="3" column="0">
+         <widget class="QPushButton" name="penUpButton">
+          <property name="text">
+           <string>Pen Up</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QPushButton" name="penDownButton">
+          <property name="text">
+           <string>Pen Down</string>
+          </property>
+         </widget>
+        </item>
         <item row="1" column="0" colspan="2">
          <widget class="QLabel" name="label_5">
           <property name="text">
@@ -145,24 +159,10 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="0">
-         <widget class="QPushButton" name="clearButton">
-          <property name="text">
-           <string>Clear</string>
-          </property>
-         </widget>
-        </item>
         <item row="2" column="1">
          <widget class="QPushButton" name="squareButton">
           <property name="text">
            <string>Draw Square</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QPushButton" name="circleButton">
-          <property name="text">
-           <string>Draw Circle</string>
           </property>
          </widget>
         </item>
@@ -182,17 +182,17 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="0">
-         <widget class="QPushButton" name="penUpButton">
+        <item row="4" column="0">
+         <widget class="QPushButton" name="clearButton">
           <property name="text">
-           <string>Pen Up</string>
+           <string>Clear</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
-         <widget class="QPushButton" name="penDownButton">
+        <item row="2" column="0">
+         <widget class="QPushButton" name="circleButton">
           <property name="text">
-           <string>Pen Down</string>
+           <string>Draw Circle</string>
           </property>
          </widget>
         </item>
@@ -213,26 +213,6 @@
       </item>
       <item>
        <layout class="QGridLayout" name="gridLayout_3">
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_6">
-          <property name="text">
-           <string>X</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QDoubleSpinBox" name="gotoXSpin">
-          <property name="minimum">
-           <double>-40.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>40.000000000000000</double>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="0">
          <widget class="QLabel" name="label_7">
           <property name="text">
@@ -250,6 +230,26 @@
           </property>
           <property name="maximum">
            <double>40.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QDoubleSpinBox" name="gotoXSpin">
+          <property name="minimum">
+           <double>-40.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>40.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>X</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
