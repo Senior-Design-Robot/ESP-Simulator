@@ -2,8 +2,10 @@
 #define MAINWINDOW_H
 
 #include "pathiterator.h"
+#include "piwifi.h"
 #include <QMainWindow>
 #include <QTimer>
+#include <QtNetwork/QTcpServer>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -30,10 +32,18 @@ private slots:
 
     void on_openPathButton_clicked();
 
+    void server1_newConnection();
+    void server2_newConnection();
+
 private:
     Ui::MainWindow *ui;
     QTimer moveTimer;
     IPathIterator *path;
+
+    QTcpServer *server1;
+    QTcpServer *server2;
+    WPacketBuffer arm1Buffer;
+    WPacketBuffer arm2Buffer;
 
     bool drawing = false;
     void toggle_drawing( bool go );

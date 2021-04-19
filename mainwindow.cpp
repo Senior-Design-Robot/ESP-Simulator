@@ -14,11 +14,21 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     moveTimer.setInterval(10);
     connect(&moveTimer, &QTimer::timeout, this, &MainWindow::moveTimer_timeout);
+
+    server1 = new QTcpServer(this);
+    connect(server1, &QTcpServer::newConnection, this, &MainWindow::server1_newConnection);
+    server1->listen(QHostAddress::AnyIPv4, 1897);
+
+    server2 = new QTcpServer(this);
+    connect(server2, &QTcpServer::newConnection, this, &MainWindow::server2_newConnection);
+    server2->listen(QHostAddress::AnyIPv4, 1898);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete server1;
+    delete server2;
 }
 
 void MainWindow::toggle_drawing( bool go )
@@ -103,10 +113,6 @@ void MainWindow::on_clearButton_clicked()
     ui->armCanvas->reset();
 }
 
-void MainWindow::on_stopButton_clicked()
-{
-
-}
 
 void MainWindow::on_gotoButton_clicked()
 {
@@ -276,4 +282,22 @@ void MainWindow::on_openPathButton_clicked()
     pqi->addMove(-10, 0);
 
     toggle_drawing(true);
+}
+
+void MainWindow::server1_newConnection()
+{
+    while( server1->hasPendingConnections() )
+    {
+        QTcpSocket *newConn = server1->nextPendingConnection();
+        new ReceiveWrapper(newConn, &arm1Buffer, this);
+    }
+}
+
+void MainWindow::server2_newConnection()
+{
+    while( server2->hasPendingConnections() )
+    {
+        QTcpSocket *newConn = server2->nextPendingConnection();
+        new ReceiveWrapper(newConn, &arm2Buffer, this);
+    }
 }
