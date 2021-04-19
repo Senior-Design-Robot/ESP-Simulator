@@ -84,6 +84,7 @@ public:
 
 signals:
     void point_received( PathElement elem );
+    void setting_received( int settingID, int settingValue );
 };
 
 
