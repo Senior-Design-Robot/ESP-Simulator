@@ -18,17 +18,7 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_xSlider_valueChanged(int value);
-    void on_ySlider_valueChanged(int value);
-    void on_circleButton_clicked();
-    void moveTimer_timeout();
-    void on_squareButton_clicked();
-    void on_clearButton_clicked();
-    void on_gotoButton_clicked();
-    void on_penUpButton_clicked();
-    void on_penDownButton_clicked();
-
-    void on_openPathButton_clicked();
+    //void on_clearButton_clicked();
 
 private:
     Ui::MainWindow *ui;
