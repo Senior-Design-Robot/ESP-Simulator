@@ -117,12 +117,14 @@ WPacketType WPacketBuffer::seekPacket()
             return (avail >= totLen ) ? WPKT_POINTS : WPKT_NULL;
         }
     }
+
+    return WPKT_NULL;
 }
 
 WPacketType WPacketBuffer::acceptData( uint8_t *data, int toRead )
 {
     int availSpace = BUF_LEN - insIndex;
-    int remainRead, totalRead;
+    int remainRead, totalRead = 0;
 
     if( toRead > availSpace )
     {

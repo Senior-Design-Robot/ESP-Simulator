@@ -15,11 +15,14 @@ private:
 
 public:
     std::vector<QPointF> pastPoints;
+    std::vector<QPointF> pastPoints2;
     bool penDown;
+    bool penDown2;
 
     explicit ArmDisplay(QWidget *parent = nullptr);
 
     void setArmPosition( struct arm_angles ang, float tipX, float tipY );
+    void setArm2Position( struct arm_angles ang, float tipX, float tipY );
     void reset();
 
 protected:

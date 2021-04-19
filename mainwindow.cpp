@@ -7,12 +7,10 @@
 #include <fstream>
 #include <sstream>
 
-PathQueueIterator arm1path;
-PathQueueIterator arm2path;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow), path(nullptr)
+    , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     moveTimer.setInterval(10);
@@ -38,31 +36,33 @@ void MainWindow::toggle_drawing( bool go )
 {
     if( go ) moveTimer.start();
     else moveTimer.stop();
-
-    drawing = go;
 }
 
-void MainWindow::recalc_angles( float x, float y )
+void MainWindow::send_status( int device )
 {
-    struct arm_angles ang = calculate_angles(x, y);
-    ui->armCanvas->setArmPosition(ang, x, y);
+    if( device == 1 )
+    {
+        // pkt_type, id, power, mode, shoulder, elbow, odo, remaining
+        QString data = QString("1,%1,1,%2,0,0,0,%3\n").arg(device, arm1_mode, arm1path.remaining());
+    }
+    else
+    {
 
-    float s_ang = rad_to_deg(ang.shoulder);
-    float e_ang = rad_to_deg(ang.elbow);
+        QString data = QString("1,%1,1,%2,0,0,0,%3\n").arg(device, arm2_mode, arm2path.remaining());
+    }
+}
+
 
 void MainWindow::moveTimer_timeout()
 {
-    if( !path )
-    {
-        moveTimer.stop();
-        return;
-    }
+    struct arm_angles ang;
+    PathElement nextMove = arm1path.moveNext();
 
-    PathElement nextMove = path->moveNext();
     switch( nextMove.type )
     {
     case PATH_MOVE:
-        recalc_angles(nextMove.x, nextMove.y);
+        ang = calculate_angles(nextMove.x, nextMove.y);
+        ui->armCanvas->setArmPosition(ang, nextMove.x, nextMove.y);
         break;
 
     case PATH_PEN_UP:
@@ -74,7 +74,27 @@ void MainWindow::moveTimer_timeout()
         break;
 
     default:
-        moveTimer.stop();
+        break;
+    }
+
+    // second arm
+    nextMove = arm2path.moveNext();
+    switch( nextMove.type )
+    {
+    case PATH_MOVE:
+        ang = calculate_angles(nextMove.x, nextMove.y);
+        ui->armCanvas->setArm2Position(ang, nextMove.x, nextMove.y);
+        break;
+
+    case PATH_PEN_UP:
+        ui->armCanvas->penDown = false;
+        break;
+
+    case PATH_PEN_DOWN:
+        ui->armCanvas->penDown = true;
+        break;
+
+    default:
         break;
     }
 }
@@ -104,7 +124,8 @@ void MainWindow::server1_newConnection()
     while( server1->hasPendingConnections() )
     {
         QTcpSocket *newConn = server1->nextPendingConnection();
-        new ReceiveWrapper(newConn, &arm1Buffer, this);
+        ReceiveWrapper *w = new ReceiveWrapper(newConn, &arm1Buffer, this);
+        connect(w, &ReceiveWrapper::point_received, this, &MainWindow::enqueueArm1);
     }
 }
 
@@ -113,6 +134,7 @@ void MainWindow::server2_newConnection()
     while( server2->hasPendingConnections() )
     {
         QTcpSocket *newConn = server2->nextPendingConnection();
-        new ReceiveWrapper(newConn, &arm2Buffer, this);
+        ReceiveWrapper *w = new ReceiveWrapper(newConn, &arm2Buffer, this);
+        connect(w, &ReceiveWrapper::point_received, this, &MainWindow::enqueueArm2);
     }
 }

@@ -21,9 +21,18 @@ void ArmDisplay::setArmPosition( struct arm_angles ang, float tipX, float tipY )
     update();
 }
 
+void ArmDisplay::setArm2Position(struct arm_angles ang, float tipX, float tipY)
+{
+    angles2 = ang;
+    if( penDown2 ) pastPoints2.push_back(QPointF(tipX, tipY));
+
+    update();
+}
+
 void ArmDisplay::reset()
 {
     pastPoints.clear();
+    pastPoints2.clear();
     update();
 }
 
