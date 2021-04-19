@@ -195,8 +195,9 @@ void ReceiveWrapper::handle_incoming_data()
         int settingID = buffer->packetByte(WFIELD_SETTING_ID);
         int settingValue = buffer->packetByte(WFIELD_SETTING_VAL);
 
-
         emit setting_received(settingID, settingValue);
+
+        buffer->munch(WPKT_SETTING_LEN);
     }
 }
 

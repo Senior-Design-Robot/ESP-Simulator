@@ -80,7 +80,11 @@ private slots:
     void handle_socket_disconn();
 
 public:
-    ReceiveWrapper( QTcpSocket *sock, WPacketBuffer *buf, QObject *parent ) : QObject(parent), socket(sock), buffer(buf) {}
+    ReceiveWrapper( QTcpSocket *sock, WPacketBuffer *buf, QObject *parent ) : QObject(parent), socket(sock), buffer(buf)
+    {
+        connect(sock, &QTcpSocket::readyRead, this, &ReceiveWrapper::handle_incoming_data);
+        connect(sock, &QTcpSocket::disconnected, this, &ReceiveWrapper::handle_socket_disconn);
+    }
 
 signals:
     void point_received( PathElement elem );

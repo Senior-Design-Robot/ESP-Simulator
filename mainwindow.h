@@ -5,6 +5,7 @@
 #include "piwifi.h"
 #include <QMainWindow>
 #include <QTimer>
+#include <QTime>
 #include <QtNetwork/QTcpServer>
 
 QT_BEGIN_NAMESPACE
@@ -35,6 +36,8 @@ public:
 public slots:
     void enqueueArm1(PathElement P);
     void enqueueArm2(PathElement P);
+    void settingChange1( int settingId, int settingVal );
+    void settingChange2( int settingId, int settingVal );
 
 private slots:
     void moveTimer_timeout();
@@ -57,7 +60,9 @@ private:
     EspMode arm1_mode = MODE_IDLE;
     EspMode arm2_mode = MODE_IDLE;
 
-    void toggle_drawing( int settingMode, int settingValue );
+    QTime lastStatus1 = QTime(0,0);
+    QTime lastStatus2 = QTime(0,0);
+
     void send_status( int device );
 };
 #endif // MAINWINDOW_H

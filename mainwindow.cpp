@@ -10,6 +10,10 @@
 
 QHostAddress rpi_addr("127.0.0.1");
 
+const int PATH_STATUS_DELAY = 500;
+const int IDLE_STATUS_DELAY = 4000;
+
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -25,6 +29,8 @@ MainWindow::MainWindow(QWidget *parent)
     server2 = new QTcpServer(this);
     connect(server2, &QTcpServer::newConnection, this, &MainWindow::server2_newConnection);
     server2->listen(QHostAddress::AnyIPv4, 1898);
+
+    moveTimer.start();
 }
 
 MainWindow::~MainWindow()
@@ -34,38 +40,20 @@ MainWindow::~MainWindow()
     delete server2;
 }
 
-void MainWindow::toggle_drawing( int settingMode, int settingValue )
-{
-    if(settingMode == SETTING_MODE)
-    {
-        if( settingValue == MODE_DRAW )
-        {
-            moveTimer.start();
-            arm1_mode = MODE_DRAW;
-            arm2_mode = MODE_DRAW;
-        }
-        else
-        {
-            moveTimer.stop();
-            arm1_mode = MODE_PAUSE;
-            arm2_mode = MODE_PAUSE;
-        }
-    }
-}
 
 void MainWindow::send_status( int device )
 {
     if( device == 1 )
     {
         // pkt_type, id, power, mode, shoulder, elbow, odo, remaining
-        QString data = QString("1,%1,1,%2,0,0,0,%3\n").arg(device, arm1_mode, arm1path.remaining());
+        QString data = QString("1,%1,1,%2,0,0,0,%3\n").arg(device).arg(arm1_mode).arg(arm1path.remaining());
         TransmitWrapper *w = new TransmitWrapper(this);
         w->start_transmit(rpi_addr, data.toUtf8());
     }
     else
     {
 
-        QString data = QString("1,%1,1,%2,0,0,0,%3\n").arg(device, arm2_mode, arm2path.remaining());
+        QString data = QString("1,%1,1,%2,0,0,0,%3\n").arg(device).arg(arm2_mode).arg(arm2path.remaining());
         TransmitWrapper *w = new TransmitWrapper(this);
         w->start_transmit(rpi_addr, data.toUtf8());
     }
@@ -75,46 +63,83 @@ void MainWindow::send_status( int device )
 void MainWindow::moveTimer_timeout()
 {
     struct arm_angles ang;
-    PathElement nextMove = arm1path.moveNext();
+    PathElement nextMove;
 
-    switch( nextMove.type )
+    QTime curTime = QTime::currentTime();
+
+    int deltaStatusTime = lastStatus1.msecsTo(curTime);
+    bool forcePathStatus = (arm1_mode == MODE_DRAW) && (arm1path.remaining() < MIN_PATH_FILL) && (deltaStatusTime >= PATH_STATUS_DELAY);
+
+    if( forcePathStatus || (deltaStatusTime >= IDLE_STATUS_DELAY) )
     {
-    case PATH_MOVE:
-        ang = calculate_angles(nextMove.x, nextMove.y);
-        ui->armCanvas->setArmPosition(ang, nextMove.x, nextMove.y);
-        break;
+        send_status(1);
+        lastStatus1 = curTime;
+    }
 
-    case PATH_PEN_UP:
-        ui->armCanvas->penDown = false;
-        break;
+    if( arm1_mode == MODE_DRAW )
+    {
+        nextMove = arm1path.moveNext();
+        switch( nextMove.type )
+        {
+        case PATH_MOVE:
+            ang = calculate_angles(nextMove.x, nextMove.y);
+            ui->armCanvas->setArmPosition(ang, nextMove.x, nextMove.y);
+            break;
 
-    case PATH_PEN_DOWN:
-        ui->armCanvas->penDown = true;
-        break;
+        case PATH_PEN_UP:
+            ui->armCanvas->penDown = false;
+            break;
 
-    default:
-        break;
+        case PATH_PEN_DOWN:
+            ui->armCanvas->penDown = true;
+            break;
+
+        case PATH_END:
+            arm1_mode = MODE_IDLE;
+            send_status(1);
+
+        default:
+            break;
+        }
     }
 
     // second arm
-    nextMove = arm2path.moveNext();
-    switch( nextMove.type )
+    deltaStatusTime = lastStatus2.msecsTo(curTime);
+    forcePathStatus = (arm2_mode == MODE_DRAW) && (arm2path.remaining() < MIN_PATH_FILL) && (deltaStatusTime >= PATH_STATUS_DELAY);
+
+    if( forcePathStatus || (deltaStatusTime >= IDLE_STATUS_DELAY) )
     {
-    case PATH_MOVE:
-        ang = calculate_angles(nextMove.x, nextMove.y);
-        ui->armCanvas->setArm2Position(ang, nextMove.x, nextMove.y);
-        break;
+        send_status(2);
+        lastStatus2 = curTime;
+    }
 
-    case PATH_PEN_UP:
-        ui->armCanvas->penDown = false;
-        break;
+    if( arm2_mode == MODE_DRAW )
+    {
+        nextMove = arm2path.moveNext();
+        switch( nextMove.type )
+        {
+        case PATH_MOVE:
+            ang = calculate_angles(nextMove.x, nextMove.y);
+            ui->armCanvas->setArm2Position(ang, nextMove.x, nextMove.y);
+            break;
 
-    case PATH_PEN_DOWN:
-        ui->armCanvas->penDown = true;
-        break;
+        case PATH_PEN_UP:
+            ui->armCanvas->penDown = false;
+            break;
 
-    default:
-        break;
+        case PATH_PEN_DOWN:
+            ang = calculate_angles(nextMove.x, nextMove.y);
+            ui->armCanvas->setArm2Position(ang, nextMove.x, nextMove.y);
+            ui->armCanvas->penDown = true;
+            break;
+
+        case PATH_END:
+            arm2_mode = MODE_IDLE;
+            send_status(2);
+
+        default:
+            break;
+        }
     }
 }
 
@@ -127,6 +152,22 @@ void MainWindow::enqueueArm1(PathElement P)
 void MainWindow::enqueueArm2(PathElement P)
 {
     arm2path.addElement(P);
+}
+
+void MainWindow::settingChange1( int settingId, int settingVal )
+{
+    if( settingId == SETTING_MODE )
+    {
+        arm1_mode = static_cast<EspMode>(settingVal);
+    }
+}
+
+void MainWindow::settingChange2( int settingId, int settingVal )
+{
+    if( settingId == SETTING_MODE )
+    {
+        arm2_mode = static_cast<EspMode>(settingVal);
+    }
 }
 
 
@@ -145,7 +186,7 @@ void MainWindow::server1_newConnection()
         QTcpSocket *newConn = server1->nextPendingConnection();
         ReceiveWrapper *w = new ReceiveWrapper(newConn, &arm1Buffer, this);
         connect(w, &ReceiveWrapper::point_received, this, &MainWindow::enqueueArm1);
-        connect(w, &ReceiveWrapper::setting_received, this, &MainWindow::toggle_drawing);
+        connect(w, &ReceiveWrapper::setting_received, this, &MainWindow::settingChange1);
     }
 }
 
@@ -156,6 +197,6 @@ void MainWindow::server2_newConnection()
         QTcpSocket *newConn = server2->nextPendingConnection();
         ReceiveWrapper *w = new ReceiveWrapper(newConn, &arm2Buffer, this);
         connect(w, &ReceiveWrapper::point_received, this, &MainWindow::enqueueArm2);
-        connect(w, &ReceiveWrapper::setting_received, this, &MainWindow::toggle_drawing);
+        connect(w, &ReceiveWrapper::setting_received, this, &MainWindow::settingChange2);
     }
 }
