@@ -1,4 +1,4 @@
-QT       += core gui serialport
+QT       += core gui serialport network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -15,6 +15,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     pathiterator.cpp \
+    piwifi.cpp \
     queuedialog.cpp
 
 HEADERS += \
@@ -25,6 +26,7 @@ HEADERS += \
     kqueue.h \
     mainwindow.h \
     pathiterator.h \
+    piwifi.h \
     queuedialog.h
 
 FORMS += \
