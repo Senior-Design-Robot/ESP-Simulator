@@ -33,7 +33,7 @@ enum WPacketType : char
 class WPacketBuffer
 {
 private:
-    static const int BUF_LEN = 512;
+    static const int BUF_LEN = 1024;
 
     char buf[BUF_LEN];
     int insIndex = 0;

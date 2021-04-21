@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1312</width>
-    <height>600</height>
+    <width>845</width>
+    <height>465</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,12 +23,22 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
+      <property name="styleSheet">
+       <string notr="true">border: 1px solid #000</string>
+      </property>
      </widget>
     </item>
     <item>
      <widget class="QPushButton" name="resetButton">
       <property name="text">
        <string>Reset</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="singleArmCheck">
+      <property name="text">
+       <string>Single Arm Mode</string>
       </property>
      </widget>
     </item>

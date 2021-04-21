@@ -13,6 +13,9 @@ struct arm_angles
 {
     float shoulder;
     float elbow;
+
+    arm_angles() : shoulder(0), elbow(0) {}
+    arm_angles( float s, float e ) : shoulder(s), elbow(e) {}
 };
 
 double calc_cosbeta( double x, double y );

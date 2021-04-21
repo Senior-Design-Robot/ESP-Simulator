@@ -165,7 +165,6 @@ void MainWindow::settingChange1( int settingId, int settingVal )
     if( settingId == SETTING_MODE )
     {
         arm1_mode = static_cast<EspMode>(settingVal);
-        arm2_mode = static_cast<EspMode>(settingVal);
     }
 }
 
@@ -175,15 +174,6 @@ void MainWindow::settingChange2( int settingId, int settingVal )
     {
         arm2_mode = static_cast<EspMode>(settingVal);
     }
-}
-
-
-static float parseFloatStrict( std::string str ) {
-    size_t lenParsed;
-    float result = std::stof(str, &lenParsed);
-
-    if( lenParsed != str.length() ) throw std::invalid_argument(str + " is not a valid floating point value");
-    return result;
 }
 
 void MainWindow::server1_newConnection()
@@ -217,4 +207,11 @@ void MainWindow::on_resetButton_clicked()
 
     arm2_mode = MODE_IDLE;
     arm2path.clear();
+}
+
+void MainWindow::on_singleArmCheck_stateChanged(int arg1)
+{
+    bool singleArm = ui->singleArmCheck->isChecked();
+    ui->armCanvas->singleArmMode = singleArm;
+    ui->armCanvas->update();
 }

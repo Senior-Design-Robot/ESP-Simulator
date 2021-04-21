@@ -58,7 +58,7 @@ uint8_t WPacketBuffer::packetByte( int idx )
 
 PathElement WPacketBuffer::packetPoint( int idx )
 {
-    PathElementType type = (PathElementType)packetByte(idx);
+    PathElementType type = static_cast<PathElementType>(packetByte(idx));
 
     // center x = 0, y = 0 on arm base for kinematics. Left of arm is -x
     float x = readPtX(idx + WPOINT_X_OFFSET);

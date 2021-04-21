@@ -46,6 +46,7 @@ private slots:
     void server2_newConnection();
 
     void on_resetButton_clicked();
+    void on_singleArmCheck_stateChanged(int arg1);
 
 private:
     Ui::MainWindow *ui;
